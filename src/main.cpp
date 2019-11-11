@@ -3,17 +3,17 @@
 #include <Servo.h>
 
 Adafruit_NeoPixel strip1(100, GPIO_NUM_22, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip2(100, GPIO_NUM_1, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel strip2(100, GPIO_NUM_21, NEO_GRB + NEO_KHZ800);
 Adafruit_NeoPixel strip3(100, GPIO_NUM_3, NEO_GRB + NEO_KHZ800);
 
-uint8_t color = 0;
+uint32_t color = 0;
 
 float servoPos = 0;
 bool servoDir = false;
 
 Servo servo1;
 
-const int32_t color_inc = 1;
+const int32_t color_inc = 50;
 const float servo_inc = 0.2;
 
 void setup() {
@@ -28,12 +28,12 @@ void setup() {
 
 uint32_t timer = xTaskGetTickCount();
 void loop() {
-  vTaskDelayUntil(&timer, 10);
+  vTaskDelayUntil(&timer, 7);
 
   color += color_inc;
-  strip1.fill(strip1.ColorHSV(color*256,255,100));
-  strip2.fill(strip2.ColorHSV(color*256,255,100));
-  strip3.fill(strip3.ColorHSV(color*256,255,100));
+  strip1.fill(strip1.ColorHSV(color,255,100));
+  strip2.fill(strip2.ColorHSV(color,255,100));
+  strip3.fill(strip3.ColorHSV(color,255,100));
   delay(1);
   portDISABLE_INTERRUPTS();
   strip1.show();
@@ -48,7 +48,7 @@ void loop() {
     }
   }else{
     servoPos -= servo_inc;
-    if(servoPos <= 0){
+    if(servoPos <= 20){
       servoDir = true;
     }
   }
