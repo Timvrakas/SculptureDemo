@@ -2,27 +2,28 @@
 #include <Adafruit_NeoPixel.h>
 #include <Servo.h>
 
-Adafruit_NeoPixel strip1(100, GPIO_NUM_22, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip2(100, GPIO_NUM_21, NEO_GRB + NEO_KHZ800);
-Adafruit_NeoPixel strip3(100, GPIO_NUM_3, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel wing1(100, GPIO_NUM_22, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel wing2(100, GPIO_NUM_3, NEO_GRB + NEO_KHZ800);
+Adafruit_NeoPixel body(100, GPIO_NUM_21, NEO_GRB + NEO_KHZ800);
 
-uint32_t color = 0;
+uint16_t color = 0;
 
 float servoPos = 0;
 bool servoDir = false;
 
 Servo servo1;
 
-const int32_t color_inc = 50;
-const float servo_inc = 0.2;
+const uint16_t color_max = 65535;
+const uint16_t color_inc = 50;
+const float servo_inc = 0.1;
 
 void setup() {
-  strip1.begin(); // Initialize NeoPixel strip object (REQUIRED)
-  strip2.begin();
-  strip3.begin();
-  strip1.show();  // Initialize all pixels to 'off'
-  strip2.show();
-  strip3.show();
+  wing1.begin(); // Initialize NeoPixel strip object (REQUIRED)
+  wing2.begin();
+  body.begin();
+  wing1.show();  // Initialize all pixels to 'off'
+  wing2.show();
+  body.show();
   servo1.attach(GPIO_NUM_23);
 }
 
@@ -31,14 +32,14 @@ void loop() {
   vTaskDelayUntil(&timer, 7);
 
   color += color_inc;
-  strip1.fill(strip1.ColorHSV(color,255,100));
-  strip2.fill(strip2.ColorHSV(color,255,100));
-  strip3.fill(strip3.ColorHSV(color,255,100));
+  wing1.fill(wing1.ColorHSV(color,255,100));
+  wing2.fill(wing2.ColorHSV(color,255,100));
+  body.fill(body.ColorHSV(color_max - color,255,100));
   delay(1);
   portDISABLE_INTERRUPTS();
-  strip1.show();
-  strip2.show();
-  strip3.show();
+  wing1.show();
+  wing2.show();
+  body.show();
   portENABLE_INTERRUPTS();
 
   if(servoDir){
