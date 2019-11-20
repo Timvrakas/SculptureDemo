@@ -8,33 +8,38 @@ Adafruit_NeoPixel body(100, GPIO_NUM_21, NEO_GRB + NEO_KHZ800);
 
 uint16_t color = 0;
 
-float servoPos = 0;
+const int servoMin = 1200;
+const int servoMax = 1800;
+int servoDelta = 0;
 bool servoDir = false;
 
 Servo servo1;
 
 const uint16_t color_max = 65535;
-const uint16_t color_inc = 50;
-const float servo_inc = 0.1;
+const uint16_t color_inc = 5; // 50
+// const float servo_inc = 0.1;
+const int servo_inc = 10;
 
-void setup() {
+void setup()
+{
   wing1.begin(); // Initialize NeoPixel strip object (REQUIRED)
   wing2.begin();
   body.begin();
-  wing1.show();  // Initialize all pixels to 'off'
+  wing1.show(); // Initialize all pixels to 'off'
   wing2.show();
   body.show();
   servo1.attach(GPIO_NUM_23);
 }
 
 uint32_t timer = xTaskGetTickCount();
-void loop() {
+void loop()
+{
   vTaskDelayUntil(&timer, 7);
 
   color += color_inc;
-  wing1.fill(wing1.ColorHSV(color,255,100));
-  wing2.fill(wing2.ColorHSV(color,255,100));
-  body.fill(body.ColorHSV(color_max - color,255,100));
+  wing1.fill(wing1.ColorHSV(color, 255, 100));
+  wing2.fill(wing2.ColorHSV(color, 255, 100));
+  body.fill(body.ColorHSV(color_max - color, 255, 100));
   delay(1);
   portDISABLE_INTERRUPTS();
   wing1.show();
@@ -42,17 +47,22 @@ void loop() {
   body.show();
   portENABLE_INTERRUPTS();
 
-  if(servoDir){
-    servoPos += servo_inc;
-    if(servoPos >= 180){
+  if (servoDir)
+  {
+    servoDelta += servo_inc;
+    if (servoDelta >= servoMax - servoMin)
+    {
       servoDir = false;
     }
-  }else{
-    servoPos -= servo_inc;
-    if(servoPos <= 20){
+  }
+  else
+  {
+    servoDelta -= servo_inc;
+    if (servoDelta <= 0)
+    {
       servoDir = true;
     }
   }
 
-  servo1.write((int)servoPos);
+  servo1.writeMicroseconds(servoMin + servoDelta);
 }
